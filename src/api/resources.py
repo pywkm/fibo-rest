@@ -8,7 +8,7 @@ class SequenceResource:
         self._logic = logic
 
     def on_get(self, _req, resp, length):
-        sequence, status = self._logic.get_sequence(length)
+        sequence, status = self._logic.get_sequence_status(length)
         if sequence:
             resp.status = falcon.HTTP_OK
             resp.body = sequence

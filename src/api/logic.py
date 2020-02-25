@@ -10,7 +10,7 @@ class ApiLogic:
     def __init__(self, storage: Storage) -> None:
         self._storage = storage
 
-    def get_sequence(
+    def get_sequence_status(
         self, length: int
     ) -> Tuple[Optional[FiboSequence], Optional[RequestStatus]]:
 
