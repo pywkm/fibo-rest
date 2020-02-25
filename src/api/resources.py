@@ -1,19 +1,18 @@
 import falcon
 from api.exceptions import StatusNotFoundError
-from api.storage.abstract import Storage
+from api.logic import ApiLogic
 
 
 class SequenceResource:
-    def __init__(self, storage: Storage):
-        self._storage = storage
+    def __init__(self, logic: ApiLogic):
+        self._logic = logic
 
     def on_get(self, _req, resp, length):
-        sequence = self._storage.get_sequence(length)
+        sequence, status = self._logic.get_sequence(length)
         if sequence:
             resp.status = falcon.HTTP_OK
             resp.body = sequence
         else:
-            status = self._storage.get_status(length)
             resp.status = falcon.HTTP_ACCEPTED
             resp.body = {
                 "statusUri": f"/api/fibo/{length}/status",
@@ -22,12 +21,12 @@ class SequenceResource:
 
 
 class StatusResource:
-    def __init__(self, storage: Storage):
-        self._storage = storage
+    def __init__(self, logic: ApiLogic):
+        self._logic = logic
 
     def on_get(self, _req, resp, length):
         try:
-            status = self._storage.get_status(length)
+            status = self._logic.get_status(length)
             resp.status = falcon.HTTP_OK
             resp.body = {
                 "estimatedTime": str(status.eta),

@@ -11,6 +11,10 @@ class Storage(abc.ABC):
         ...
 
     @abc.abstractmethod
+    def get_last_element(self, length: int) -> int:
+        ...
+
+    @abc.abstractmethod
     def get_status(self, length: int) -> RequestStatus:
         ...
 

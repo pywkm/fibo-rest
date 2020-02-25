@@ -25,6 +25,12 @@ class MemoryStorage(Storage):
             return None
         return [elt[1] for elt in elements]
 
+    def get_last_element(self, length: int) -> int:
+        elements = sorted(self._calculated_numbers.items(), key=lambda elt: elt[0])[
+            :length
+        ]
+        return elements[-1][1]
+
     def get_status(self, length: int) -> RequestStatus:
         if length >= 10:
             raise StatusNotFoundError
