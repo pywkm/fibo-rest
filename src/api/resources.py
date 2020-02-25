@@ -11,29 +11,29 @@ class LogicDependentResource:
 
 class SequenceResource(LogicDependentResource):
     def on_get(self, _req, resp, length):
-        sequence, status = self._logic.get_sequence_status(length)
-        if sequence:
+        dto = self._logic.get_sequence_with_status(length)
+        if dto.sequence:
             resp.status = falcon.HTTP_OK
             resp.body = {
-                "sequence": sequence,
+                "sequence": dto.sequence,
             }
         else:
             resp.status = falcon.HTTP_ACCEPTED
             resp.body = {
                 "sequence": None,
                 "statusUri": STATUS_ENDPOINT.format(length),
-                "estimatedTime": str(status.eta),
+                "estimatedTime": str(dto.status.eta),
             }
 
 
 class StatusResource(LogicDependentResource):
     def on_get(self, _req, resp, length):
         try:
-            status = self._logic.get_status(length)
+            status = self._logic.get_request_status(length)
             resp.status = falcon.HTTP_OK
             resp.body = {
                 "estimatedTime": str(status.eta),
-                "numbersCalculated": 15,
+                "numbersCalculated": status.calculated_numbers,
                 "numbersRequired": status.length,
             }
         except StatusNotFoundError:

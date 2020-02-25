@@ -1,40 +1,46 @@
 from datetime import datetime, timedelta
-from typing import Optional, Tuple
+from typing import Tuple
 
-from api.entities import RequestStatus
+from api.config import DIFFICULTY
+from api.entities import RequestStatus, SequenceStatusDTO
 from api.storage.abstract import Storage
-from api.types import FiboSequence
+from api.types import Sequence
 
 
 class ApiLogic:
     def __init__(self, storage: Storage) -> None:
         self._storage = storage
 
-    def get_sequence_status(
-        self, length: int
-    ) -> Tuple[Optional[FiboSequence], Optional[RequestStatus]]:
-
+    def get_sequence_with_status(self, length: int) -> SequenceStatusDTO:
         sequence = self._storage.get_sequence(length)
 
-        if sequence:
-            return sequence, None
+        if sequence and len(sequence) == length:
+            return SequenceStatusDTO(sequence=[item[1] for item in sequence])
 
-        # send calculation request to rabbitmq
+        # last_fibo_numbers = self._get_last_fibo_numbers(sequence)
+        # send calculation request to rabbitmq (send both last numbers and total length)
 
-        last_element = self._storage.get_last_element(length)
-        status = RequestStatus(
-            length,
-            last_element,
-            datetime.now(),
-            datetime.now() + timedelta(days=length),
-        )
+        calculated_items = len(sequence)
+        now = datetime.now()
+        eta = now + timedelta(milliseconds=(length - calculated_items) * DIFFICULTY)
+        status = RequestStatus(length, calculated_items, now, eta,)
 
         self._storage.save_status(status)
 
-        return None, status
+        return SequenceStatusDTO(status=status)
 
-    def get_status(self, length: int) -> RequestStatus:
-        return self._storage.get_status(length)
+    def get_request_status(self, length: int) -> RequestStatus:
+        old_status = self._storage.get_status(length)
+        sequence = self._storage.get_sequence(length)
+        calculated_items = len(sequence)
+        new_eta = datetime.now() + timedelta(
+            milliseconds=(length - calculated_items) * DIFFICULTY
+        )
+        new_status = RequestStatus(
+            old_status.length, calculated_items, old_status.requested_at, new_eta
+        )
+        return new_status
 
-    def _update_status(self, length: int) -> RequestStatus:
-        pass
+    @staticmethod
+    def _get_last_fibo_numbers(sequence: Sequence) -> Tuple[int, int]:
+        return sequence[-2][1], sequence[-1][1]  # dummy assumption

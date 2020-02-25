@@ -1,42 +1,34 @@
-from datetime import datetime, timedelta
 from typing import Dict, Optional
 
 from api.entities import RequestStatus
 from api.exceptions import StatusNotFoundError
 from api.storage.abstract import Storage
-from api.types import FiboSequence
+from api.types import Sequence
 
 
 class MemoryStorage(Storage):
-    _calculated_numbers: Dict[int, int] = {0: 0, 1: 1}
+    """Only for test purposes. Won't work with many workers - they don't share the same memory"""
+
+    _fibonacci_numbers: Dict[int, int] = {0: 0, 1: 1}
+    _request_statuses: Dict[int, RequestStatus] = {}
 
     def __init__(self, seed: Optional[Dict[int, int]] = None) -> None:
         if seed:
-            self._calculated_numbers = seed
+            self._fibonacci_numbers = seed
 
-    def get_sequence(self, length: int) -> Optional[FiboSequence]:
-        if length > len(self._calculated_numbers) or length < 1:
-            return None
-        elements = sorted(self._calculated_numbers.items(), key=lambda elt: elt[0])[
-            :length
-        ]
-        print(elements)
-        if elements[-1][0] != length - 1:
-            return None
-        return [elt[1] for elt in elements]
+    @property
+    def _sorted_items(self) -> Sequence:
+        return sorted(self._fibonacci_numbers.items(), key=lambda item: item[0])
 
-    def get_last_element(self, length: int) -> int:
-        elements = sorted(self._calculated_numbers.items(), key=lambda elt: elt[0])[
-            :length
-        ]
-        return elements[-1][1]
+    def get_sequence(self, up_to_idx: int) -> Sequence:
+        """First element has idx = 0, so length isn't the same as idx."""
+        return [item for item in self._sorted_items if item[0] < up_to_idx]
 
     def get_status(self, length: int) -> RequestStatus:
-        if length >= 10:
+        try:
+            return self._request_statuses[length]
+        except KeyError:
             raise StatusNotFoundError
-        return RequestStatus(
-            length, 5, datetime.now(), datetime.now() + timedelta(seconds=3)
-        )
 
     def save_status(self, status: RequestStatus) -> None:
-        pass
+        self._request_statuses[status.length] = status

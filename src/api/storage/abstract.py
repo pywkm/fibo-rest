@@ -1,17 +1,12 @@
 import abc
-from typing import Optional
 
 from api.entities import RequestStatus
-from api.types import FiboSequence
+from api.types import Sequence
 
 
 class Storage(abc.ABC):
     @abc.abstractmethod
-    def get_sequence(self, length: int) -> Optional[FiboSequence]:
-        ...
-
-    @abc.abstractmethod
-    def get_last_element(self, length: int) -> int:
+    def get_sequence(self, up_to_idx: int) -> Sequence:
         ...
 
     @abc.abstractmethod
