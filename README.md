@@ -78,8 +78,8 @@ There are only two endpoints exposed:
         ```json
         {
             "estimatedTime": "2020-03-03 12:12:22",
-            "numbersCalculated": "15",
-            "numbersRequired": "55"
+            "numbersCalculated": 15,
+            "numbersRequired": 55
         }
      
      The `estimatedTime` may differ from original one got from `/api/fibo/<length>` endpoint, because it is updated "live".

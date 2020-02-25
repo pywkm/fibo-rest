@@ -1,9 +1,11 @@
 import falcon
 from api.middlewares import ContentEncodingMiddleware
-from api.resources import RestResource
+from api.resources import SequenceResource, StatusResource
+from api.storage.memory import MemoryStorage
 
-app = falcon.API(  # pylint: disable=invalid-name
-    middleware=[ContentEncodingMiddleware()]
-)
+app = falcon.API(middleware=[ContentEncodingMiddleware()])
 
-app.add_route("/rest", RestResource())
+storage = MemoryStorage()
+
+app.add_route("/api/fibo/{length:int}", SequenceResource(storage))
+app.add_route("/api/fibo/{length:int}/status", StatusResource(storage))
