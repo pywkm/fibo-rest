@@ -5,7 +5,7 @@ from api.storage.memory import MemoryStorage
 
 @pytest.fixture()
 def logic() -> ApiLogic:
-    storage = MemoryStorage({0: 1, 1: 1, 2: 1, 3: 2, 4: 3, 5: 5})
+    storage = MemoryStorage({0: 0, 1: 1, 2: 1, 3: 2, 4: 3, 5: 5})
     return ApiLogic(storage)
 
 

@@ -1,4 +1,4 @@
-# fibo-rest
+# Fibo REST
 
 ### Exemplary project presenting microservices-like approach to calculating fibonacci sequence.
 
@@ -28,28 +28,30 @@ That's all, application is working, and exposing API on the `http://localhost:55
 ### API endpoints
 There are only two endpoints exposed:
 
-* GET `/api/fibo/<length>`
+* GET `/fibo/<length>`
 
     To retrieve sequence `<length>` long
 
     Exemplary request:
-    * GET `http://localhost/api/fibo/5`
+    * GET `http://localhost:5555/fibo/5`
     
     Exemplary response:
     * Status code: 200
     
         Payload:
         ```json
-        [0, 1, 1, 2, 3]
+        {
+            "sequence": [0, 1, 1, 2, 3]
+        }     
         ```
     
-    Because we are simulating, that calculating fibonacci sequences is time consuming (which is true for very long
-    sequences in fact), GET request to that endpoint doesn't always return status code 200 (OK) and response with sequence.
+    Because we are simulating, that calculating Fibonacci sequences is time consuming (which is true for very long
+    sequences), GET request to that endpoint doesn't always return status code 200 (OK) and response with sequence.
 
-    When sequence isn't already calculated (and cached in database), API will respond with status code 202 (Accepted):
+    When sequence isn't cached in database, API will respond with status code 202 (Accepted) with slightly different response:
 
     Exemplary request:
-    * GET `http://localhost/api/fibo/55`
+    * GET `http://localhost:5555/fibo/55`
     
     Exemplary response:
     * Status code: 202
@@ -57,19 +59,20 @@ There are only two endpoints exposed:
         Payload:
         ```json
         {
-            "statusUri": "/api/fibo/55/status",
+            "sequence": null,
+            "statusUri": "/fibo/55/status",
             "estimatedTime": "2020-03-03 12:12:12"
         }
         ```
-     Which means calculation is triggered, and result should be accessible around `estimatedTime` on the `/api/fibo/55`
-     endpoint. There's url to status endpoint, where calculation progress can be monitored.
+     Which means calculation is triggered, and result should be accessible around `estimatedTime` on the `/fibo/55`
+     endpoint. There's given uri to status endpoint, where calculation progress can be monitored.
 
-* GET `/api/fibo/<length>/status`
+* GET `/fibo/<length>/status`
 
     To check status of (previously triggered) `<length>` long calculation
 
     Exemplary request:
-    * GET `http://localhost/api/fibo/55/status`
+    * GET `http://localhost:5555/fibo/55/status`
     
     Exemplary response:
     * Status code: 200
@@ -82,16 +85,23 @@ There are only two endpoints exposed:
             "numbersRequired": 55
         }
      
-     The `estimatedTime` may differ from original one got from `/api/fibo/<length>` endpoint, because it is updated "live".
+     The `estimatedTime` may differ from original one got from `/fibo/<length>` endpoint, because it is updated "live".
      
-     If calculation of particular wasn't sequence wasn't triggered yet (by request to the first endpoint), status will
-     return Not Found response:
+     If calculation of particular sequence wasn't triggered yet (by request to the first endpoint), status will
+     return Not Found (404) response:
      
          Exemplary request:
-    * GET `http://localhost/api/fibo/515/status`
+    * GET `http://localhost:5555/fibo/515/status`
     
     Exemplary response:
     * Status code: 404
+        
+        Payload:
+        ```json
+        {
+          "message": "Calculation for 515 wasn't requested yet"
+        }
+        ```
 
 ## Architecture
 
