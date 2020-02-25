@@ -8,6 +8,6 @@ services:
         env_file:
           - ./.env
         ports:
-          - "9000:8000"
+          - "${GUNICORN_PORT}:${GUNICORN_PORT}"
         volumes:
           - "./src/:/app/src/"

@@ -1,0 +1,19 @@
+[MASTER]
+argument-rgx=[a-z_][a-z0-9_]{2,45}$
+function-rgx=[a-z_][a-z0-9_]{2,115}$
+method-rgx=[a-z_][a-z0-9_]{2,45}$
+
+[MESSAGES CONTROL]
+disable=missing-docstring,too-few-public-methods,fixme,redefined-outer-name,no-self-use,logging-fstring-interpolation,trailing-comma-tuple,unsubscriptable-object,bad-continuation
+good-names=id,metadata,Base,logger,OK,CACHE_KEY
+max-line-length=100
+
+[SIMILARITIES]
+ignore-imports=yes
+# protect against duplicates between abstract classes and those which inherit from them
+# max 5 arguments, each one in a separate line
+# + line for beginning of a definition
+# + line for ending of the definition
+min-similarity-lines=7
+ignore-comments=yes
+ignore-docstrings=yes
