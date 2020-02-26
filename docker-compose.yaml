@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
     api:
@@ -14,8 +14,7 @@ services:
         depends_on:
           - database
           - rabbitmq
-        networks:
-          - fibo_network
+
     database:
         image: postgres:12.0-alpine
         restart: always
@@ -31,17 +30,12 @@ services:
           - postgres_data:/var/lib/postgresql/data/
         command:
           - -p ${DB_PORT}
-        networks:
-          - fibo_network
+
     rabbitmq:
         image: rabbitmq:3.8.2-management-alpine
         ports:
-          # The standard AMQP protocol port
-          - '5672:5672'
-          # HTTP management UI
-          - '15672:15672'
-        networks:
-          - fibo_network
+          - "15672:15672"
+
     generator:
         build:
           context: ./
@@ -52,8 +46,7 @@ services:
           - "./src/:/app/src/"
         depends_on:
           - rabbitmq
-        networks:
-          - fibo_network
+
     ingest:
       build:
         context: ./
@@ -65,11 +58,6 @@ services:
       depends_on:
         - database
         - rabbitmq
-      networks:
-        - fibo_network
 
 volumes:
     postgres_data:
-
-networks:
-    fibo_network:

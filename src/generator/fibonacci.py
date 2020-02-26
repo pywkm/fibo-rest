@@ -2,7 +2,7 @@ import json
 from time import sleep
 
 from generator.config import FIBO_QUEUE
-from generator.messaging import broker
+from messaging import broker
 
 
 def callback(_ch, _method, _properties, body):
