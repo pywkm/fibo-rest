@@ -18,7 +18,7 @@ class RabbitMqBroker(Broker):
             pika.ConnectionParameters(host=RABBITMQ_HOST)
         )
         channel = connection.channel()
-        channel.exchange_declare(exchange="", exchange_type="direct", durable=True)
+        channel.queue_declare(queue=queue)
         channel.basic_publish(
             exchange="",
             routing_key=queue,
