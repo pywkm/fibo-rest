@@ -1,4 +1,5 @@
 import falcon
+
 from api.config import STATUS_ENDPOINT
 from api.exceptions import StatusNotFoundError
 from api.logic import ApiLogic
@@ -11,6 +12,12 @@ class LogicDependentResource:
 
 class SequenceResource(LogicDependentResource):
     def on_get(self, _req, resp, length):
+        if length < 1:
+            resp.status = falcon.HTTP_BAD_REQUEST
+            resp.body = {
+                "message": "Fibonacci sequence length must be positive integer",
+            }
+            return
         dto = self._logic.get_sequence_with_status(length)
         if dto.sequence:
             resp.status = falcon.HTTP_OK
@@ -28,6 +35,12 @@ class SequenceResource(LogicDependentResource):
 
 class StatusResource(LogicDependentResource):
     def on_get(self, _req, resp, length):
+        if length < 1:
+            resp.status = falcon.HTTP_BAD_REQUEST
+            resp.body = {
+                "message": "Fibonacci sequence length must be positive integer",
+            }
+            return
         try:
             status = self._logic.get_request_status(length)
             resp.status = falcon.HTTP_OK

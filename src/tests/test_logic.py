@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+
 from api.config import DIFFICULTY
 from api.entities import SequenceStatusDTO
 from api.exceptions import StatusNotFoundError

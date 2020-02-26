@@ -1,3 +1,3 @@
 #!/bin/sh
 
-gunicorn api.app:app -c ./api/gunicorn.conf.py --reload
+gunicorn 'api.app:get_app()' -c ./api/gunicorn.conf.py --reload

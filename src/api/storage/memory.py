@@ -10,9 +10,10 @@ class MemoryStorage(Storage):
     """Only for test purposes. Won't work with many workers - they don't share the same memory"""
 
     _fibonacci_numbers: Dict[int, int] = {0: 0, 1: 1}
-    _request_statuses: Dict[int, RequestStatus] = {}
+    _request_statuses: Dict[int, RequestStatus]
 
     def __init__(self, seed: Optional[Dict[int, int]] = None) -> None:
+        self._request_statuses = {}
         if seed:
             self._fibonacci_numbers = seed
 
