@@ -1,0 +1,2 @@
+class StatusNotFoundError(Exception):
+    pass
