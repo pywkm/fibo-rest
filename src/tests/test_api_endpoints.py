@@ -146,4 +146,4 @@ def test_message_is_sent_to_broker(
 
     expected_queue = JOB_QUEUE
     expected_message = {"length": length, "last_numbers": last_two_numbers}
-    broker_mock.send.assert_called_once_with(expected_queue, expected_message)
+    broker_mock.publish.assert_called_once_with(expected_queue, expected_message)

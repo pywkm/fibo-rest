@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
 from api.entities import RequestStatus, SequenceStatusDTO
-from api.messaging import Broker
 from api.storage.abstract import Storage
 from api.types import Sequence
 from config import DIFFICULTY, JOB_QUEUE
+from messaging.broker import Broker
 
 
 class ApiLogic:
@@ -22,7 +22,7 @@ class ApiLogic:
             "length": length,
             "last_numbers": self._get_last_fibo_numbers(sequence),
         }
-        self._broker.send(JOB_QUEUE, message)
+        self._broker.publish(JOB_QUEUE, message)
 
         calculated_items = len(sequence)
         now = datetime.now()

@@ -1,12 +1,13 @@
 import falcon
 
 from api.logic import ApiLogic
-from api.messaging import Broker, RabbitMqBroker
 from api.middlewares import ContentEncodingMiddleware
 from api.resources import SequenceResource, StatusResource
 from api.storage.abstract import Storage
 from api.storage.db import DbStorage
 from config import SEQUENCE_ENDPOINT, STATUS_ENDPOINT
+from messaging.abstract import Broker
+from messaging.broker import RabbitMqBroker
 
 
 def create_app(storage: Storage, broker: Broker) -> falcon.API:

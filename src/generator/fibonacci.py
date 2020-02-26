@@ -2,7 +2,7 @@ import json
 from time import sleep
 
 from config import FIBO_QUEUE
-from messaging import broker
+from messaging.broker import RabbitMqBroker
 
 
 def callback(_ch, _method, _properties, body):
@@ -12,4 +12,4 @@ def callback(_ch, _method, _properties, body):
 
 def calculate(length, last_numbers):
     sleep(3)
-    broker.publish(FIBO_QUEUE, {length: last_numbers})
+    RabbitMqBroker().publish(FIBO_QUEUE, {length: last_numbers})

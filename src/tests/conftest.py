@@ -4,9 +4,9 @@ import pytest
 from mock import Mock
 
 from api.logic import ApiLogic
-from api.messaging import Broker
 from api.storage.abstract import Storage
 from api.storage.memory import MemoryStorage
+from messaging.abstract import Broker
 
 
 @pytest.fixture
