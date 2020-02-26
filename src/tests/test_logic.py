@@ -2,10 +2,10 @@ from datetime import timedelta
 
 import pytest
 
-from api.config import DIFFICULTY
 from api.entities import SequenceStatusDTO
 from api.exceptions import StatusNotFoundError
 from api.logic import ApiLogic
+from config import DIFFICULTY
 
 
 def test_known_sequence_is_immediately_returned(logic: ApiLogic) -> None:

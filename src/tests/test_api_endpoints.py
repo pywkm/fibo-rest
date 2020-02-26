@@ -7,9 +7,9 @@ from falcon import testing
 from mock import Mock
 
 from api.app import create_app
-from api.config import DIFFICULTY, JOB_QUEUE, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
 from api.storage.abstract import Storage
 from api.types import FiboSequence, Sequence
+from config import DIFFICULTY, JOB_QUEUE, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
 
 
 @pytest.fixture

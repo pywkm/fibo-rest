@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from ingest.config import FIBO_QUEUE
+from config import FIBO_QUEUE
 from ingest.db import callback
 from messaging import broker
 

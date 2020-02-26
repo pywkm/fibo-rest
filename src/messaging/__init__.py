@@ -2,7 +2,8 @@ import json
 from typing import Callable
 
 import pika
-from messaging.config import FIBO_QUEUE, JOB_QUEUE, RABBITMQ_HOST
+
+from config import FIBO_QUEUE, JOB_QUEUE, RABBITMQ_HOST
 
 
 class Broker:

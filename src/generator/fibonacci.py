@@ -1,7 +1,7 @@
 import json
 from time import sleep
 
-from generator.config import FIBO_QUEUE
+from config import FIBO_QUEUE
 from messaging import broker
 
 

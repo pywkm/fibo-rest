@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from api.config import DIFFICULTY, JOB_QUEUE
 from api.entities import RequestStatus, SequenceStatusDTO
 from api.messaging import Broker
 from api.storage.abstract import Storage
 from api.types import Sequence
+from config import DIFFICULTY, JOB_QUEUE
 
 
 class ApiLogic:

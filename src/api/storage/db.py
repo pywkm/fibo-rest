@@ -7,11 +7,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
-from api.config import DATABASE_URL
 from api.entities import RequestStatus
 from api.exceptions import StatusNotFoundError
 from api.storage.abstract import Storage
 from api.types import Sequence
+from config import DATABASE_URL
 
 
 class SessionScope:

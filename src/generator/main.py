@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from generator.config import JOB_QUEUE
+from config import JOB_QUEUE
 from generator.fibonacci import callback
 from messaging import broker
 

@@ -3,7 +3,7 @@ import json
 
 import pika
 
-from api.config import RABBITMQ_HOST
+from config import RABBITMQ_HOST
 
 
 class Broker(abc.ABC):
