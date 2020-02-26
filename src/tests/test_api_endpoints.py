@@ -6,7 +6,7 @@ import pytest
 from falcon import testing
 
 from api.app import create_app
-from api.config import DIFFICULTY
+from api.config import DIFFICULTY, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
 from api.storage.abstract import Storage
 from api.storage.memory import MemoryStorage
 from api.types import FiboSequence
@@ -37,7 +37,7 @@ def test_get_sequence_for_stored_data(
 ):
     expected_response = {"sequence": expected_sequence}
 
-    response = client.simulate_get(f"/fibo/{length}")
+    response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_OK
     assert response.json == expected_response
@@ -52,7 +52,7 @@ def test_get_sequence_when_data_is_incomplete(
     missing_numbers: int,
     length: int,
 ):
-    expected_status_uri = f"/fibo/{length}/status"
+    expected_status_uri = STATUS_ENDPOINT.format(length)
     expected_eta = time_to_freeze + timedelta(milliseconds=DIFFICULTY * missing_numbers)
     expected_response = {
         "sequence": None,
@@ -61,7 +61,7 @@ def test_get_sequence_when_data_is_incomplete(
     }
 
     with freezegun.freeze_time(time_to_freeze):
-        response = client.simulate_get(f"/fibo/{length}")
+        response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_ACCEPTED
     assert response.json == expected_response
@@ -77,7 +77,7 @@ def test_get_sequence_invalid_number_returns_bad_request_error(
         "message": "Fibonacci sequence length must be positive integer"
     }
 
-    response = client.simulate_get(f"/fibo/{length}")
+    response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_BAD_REQUEST
     assert response.json == expected_response
@@ -91,7 +91,7 @@ def test_get_status_unknown_status_returns_not_found_error(
 ):
     expected_response = {"message": f"Calculation for {length} wasn't requested yet"}
 
-    response = client.simulate_get(f"/fibo/{length}/status")
+    response = client.simulate_get(STATUS_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_NOT_FOUND
     assert response.json == expected_response
@@ -107,7 +107,7 @@ def test_get_status_invalid_length_returns_bad_request_error(
         "message": f"Fibonacci sequence length must be positive integer"
     }
 
-    response = client.simulate_get(f"/fibo/{length}/status")
+    response = client.simulate_get(STATUS_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_BAD_REQUEST
     assert response.json == expected_response
@@ -124,7 +124,7 @@ def test_get_status_after_requesting_status_returns_response(
 ):
     # first request the calculation
     with freezegun.freeze_time(time_to_freeze):
-        sequence_response = client.simulate_get(f"/fibo/{length}")
+        sequence_response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
     assert sequence_response.status == falcon.HTTP_ACCEPTED
 
     # now get status

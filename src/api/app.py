@@ -5,7 +5,7 @@ from api.logic import ApiLogic
 from api.middlewares import ContentEncodingMiddleware
 from api.resources import SequenceResource, StatusResource
 from api.storage.abstract import Storage
-from api.storage.memory import MemoryStorage
+from api.storage.db import DbStorage
 
 
 def create_app(storage: Storage) -> falcon.API:
@@ -19,5 +19,5 @@ def create_app(storage: Storage) -> falcon.API:
 
 
 def get_app():
-    storage = MemoryStorage({0: 0, 1: 1, 2: 1, 3: 2, 4: 3, 5: 5})
+    storage = DbStorage()
     return create_app(storage)

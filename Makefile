@@ -8,6 +8,10 @@ help:  ## Show this help
 setup-dev:  ## Prepare dev env (install requirements)
 	pip install -r requirements.dev.txt
 
+.PHONY: init-db
+init-db:  ## Create tables and fill with initial data
+	docker-compose exec api python init_db.py
+
 .PHONY: start-dev
 start-dev:  ## Start dev services
 	docker-compose up -d --build
