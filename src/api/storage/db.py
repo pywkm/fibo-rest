@@ -66,6 +66,7 @@ class DbStorage(Storage):
             sequence = (
                 session.query(FibonacciNumber.index, FibonacciNumber.value)
                 .filter(FibonacciNumber.index < up_to_idx)
+                .order_by(FibonacciNumber.index)
                 .all()
             )
 
@@ -99,4 +100,4 @@ class DbStorage(Storage):
             eta=status.eta,
         )
         with self._session_scope() as session:
-            session.add(row)
+            session.merge(row)

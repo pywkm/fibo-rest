@@ -1,15 +1,16 @@
 from datetime import datetime, timedelta
-from typing import Tuple
 
-from api.config import DIFFICULTY
+from api.config import DIFFICULTY, JOB_QUEUE
 from api.entities import RequestStatus, SequenceStatusDTO
+from api.messaging import Broker
 from api.storage.abstract import Storage
 from api.types import Sequence
 
 
 class ApiLogic:
-    def __init__(self, storage: Storage) -> None:
+    def __init__(self, storage: Storage, broker: Broker) -> None:
         self._storage = storage
+        self._broker = broker
 
     def get_sequence_with_status(self, length: int) -> SequenceStatusDTO:
         sequence = self._storage.get_sequence(length)
@@ -17,13 +18,16 @@ class ApiLogic:
         if sequence and len(sequence) == length:
             return SequenceStatusDTO(sequence=[item[1] for item in sequence])
 
-        # last_fibo_numbers = self._get_last_fibo_numbers(sequence)
-        # send calculation request to rabbitmq (send both last numbers and total length)
+        message = {
+            "length": length,
+            "last_numbers": self._get_last_fibo_numbers(sequence),
+        }
+        self._broker.send(JOB_QUEUE, message)
 
         calculated_items = len(sequence)
         now = datetime.now()
         eta = now + timedelta(milliseconds=(length - calculated_items) * DIFFICULTY)
-        status = RequestStatus(length, calculated_items, now, eta,)
+        status = RequestStatus(length, calculated_items, now, eta)
 
         self._storage.save_status(status)
 
@@ -42,5 +46,5 @@ class ApiLogic:
         return new_status
 
     @staticmethod
-    def _get_last_fibo_numbers(sequence: Sequence) -> Tuple[int, int]:
-        return sequence[-2][1], sequence[-1][1]  # dummy assumption
+    def _get_last_fibo_numbers(sequence: Sequence) -> Sequence:
+        return [sequence[-2], sequence[-1]]  # dummy assumption

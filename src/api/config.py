@@ -10,3 +10,6 @@ DB_USER = os.getenv("DB_USER")
 DB_PORT = os.getenv("DB_PORT")
 DB_PASS = os.getenv("DB_PASS")
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
+JOB_QUEUE = os.getenv("JOB_QUEUE", "job_queue")

@@ -5,13 +5,7 @@ import pytest
 from api.entities import RequestStatus
 from api.exceptions import StatusNotFoundError
 from api.storage.abstract import Storage
-from api.storage.memory import MemoryStorage
 from api.types import Sequence
-
-
-@pytest.fixture
-def storage() -> Storage:
-    return MemoryStorage({0: 0, 1: 1, 2: 1, 3: 2, 10: 55})
 
 
 @pytest.mark.parametrize(
@@ -22,9 +16,9 @@ def storage() -> Storage:
         (1, [(0, 0)]),
         (2, [(0, 0), (1, 1)]),
         (3, [(0, 0), (1, 1), (2, 1)]),
-        (5, [(0, 0), (1, 1), (2, 1), (3, 2)]),
-        (13, [(0, 0), (1, 1), (2, 1), (3, 2), (10, 55)]),
-        (42, [(0, 0), (1, 1), (2, 1), (3, 2), (10, 55)]),
+        (5, [(0, 0), (1, 1), (2, 1), (3, 2), (4, 3)]),
+        (13, [(0, 0), (1, 1), (2, 1), (3, 2), (4, 3), (5, 5), (10, 55)]),
+        (42, [(0, 0), (1, 1), (2, 1), (3, 2), (4, 3), (5, 5), (10, 55)]),
     ],
 )
 def test_get_sequence(
