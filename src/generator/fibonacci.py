@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass
 from time import sleep
+from typing import Dict, Tuple
 
 from config import DIFFICULTY, FIBO_QUEUE
 from messaging.abstract import Broker
@@ -11,6 +12,9 @@ from messaging.broker import RabbitMqBroker
 class FibonacciNum:
     index: int
     value: int
+
+
+MEMORY_CACHE: Dict[Tuple[int, int], FibonacciNum] = {}
 
 
 def callback(_ch, _method, _properties, body: bytes):
@@ -25,8 +29,13 @@ def publish_sequence(
     up_to_index: int, first: FibonacciNum, second: FibonacciNum, broker: Broker, difficulty: int
 ) -> None:
     while second.index < up_to_index:
-        first, second = second, calculate_next_fibonacci(first, second, difficulty)
-        broker.publish(FIBO_QUEUE, {second.index: second.value})
+        if (first.index, second.index) in MEMORY_CACHE:
+            first, second = second, MEMORY_CACHE[(first.index, second.index)]
+            continue
+        next_fibo = calculate_next_fibonacci(first, second, difficulty)
+        broker.publish(FIBO_QUEUE, {next_fibo.index: next_fibo.value})
+        MEMORY_CACHE[(first.index, second.index)] = next_fibo
+        first, second = second, next_fibo
 
 
 def calculate_next_fibonacci(

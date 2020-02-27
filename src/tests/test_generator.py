@@ -24,9 +24,12 @@ def test_calculating_next_fibonacci_numbers(
 @pytest.mark.parametrize(
     "first_fibo, second_fibo, up_to_index, expected_sequence",
     [
+        (FibonacciNum(0, 0), FibonacciNum(1, 1), 1, []),
         (FibonacciNum(0, 0), FibonacciNum(1, 1), 3, [{2: 1}, {3: 2}]),
         (FibonacciNum(2, 1), FibonacciNum(3, 2), 4, [{4: 3}]),
+        (FibonacciNum(0, 0), FibonacciNum(1, 1), 4, []),  # cached
         (FibonacciNum(10, 55), FibonacciNum(11, 89), 14, [{12: 144}, {13: 233}, {14: 377}]),
+        (FibonacciNum(10, 55), FibonacciNum(11, 89), 16, [{15: 610}, {16: 987}]),  # cached
     ],
 )
 def test_publishing_sequence(
