@@ -19,8 +19,7 @@ def client(storage: Storage, broker_mock: Mock) -> testing.TestClient:
 
 
 @pytest.mark.parametrize(
-    "length, expected_sequence",
-    [(1, [0]), (2, [0, 1]), (4, [0, 1, 1, 2]), (5, [0, 1, 1, 2, 3])],
+    "length, expected_sequence", [(1, [0]), (2, [0, 1]), (4, [0, 1, 1, 2]), (5, [0, 1, 1, 2, 3])],
 )
 def test_get_sequence_for_stored_data(
     client: testing.TestClient, length: int, expected_sequence: FiboSequence
@@ -37,10 +36,7 @@ def test_get_sequence_for_stored_data(
     "length, missing_numbers", [(7, 1), (11, 4), (100, 93)],
 )
 def test_get_sequence_when_data_is_incomplete(
-    client: testing.TestClient,
-    time_to_freeze: datetime,
-    missing_numbers: int,
-    length: int,
+    client: testing.TestClient, time_to_freeze: datetime, missing_numbers: int, length: int,
 ):
     expected_status_uri = STATUS_ENDPOINT.format(length)
     expected_eta = time_to_freeze + timedelta(milliseconds=DIFFICULTY * missing_numbers)
@@ -63,9 +59,7 @@ def test_get_sequence_when_data_is_incomplete(
 def test_get_sequence_invalid_number_returns_bad_request_error(
     client: testing.TestClient, length: int
 ):
-    expected_response = {
-        "message": "Fibonacci sequence length must be positive integer"
-    }
+    expected_response = {"message": "Fibonacci sequence length must be positive integer"}
 
     response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 
@@ -76,9 +70,7 @@ def test_get_sequence_invalid_number_returns_bad_request_error(
 @pytest.mark.parametrize(
     "length", [1, 5, 100],
 )
-def test_get_status_unknown_status_returns_not_found_error(
-    client: testing.TestClient, length: int
-):
+def test_get_status_unknown_status_returns_not_found_error(client: testing.TestClient, length: int):
     expected_response = {"message": f"Calculation for {length} wasn't requested yet"}
 
     response = client.simulate_get(STATUS_ENDPOINT.format(length))
@@ -93,9 +85,7 @@ def test_get_status_unknown_status_returns_not_found_error(
 def test_get_status_invalid_length_returns_bad_request_error(
     client: testing.TestClient, length: int
 ):
-    expected_response = {
-        "message": f"Fibonacci sequence length must be positive integer"
-    }
+    expected_response = {"message": f"Fibonacci sequence length must be positive integer"}
 
     response = client.simulate_get(STATUS_ENDPOINT.format(length))
 
@@ -107,10 +97,7 @@ def test_get_status_invalid_length_returns_bad_request_error(
     "length, missing_numbers", [(7, 1), (11, 4), (100, 93)],
 )
 def test_get_status_after_requesting_status_returns_response(
-    client: testing.TestClient,
-    time_to_freeze: datetime,
-    missing_numbers: int,
-    length: int,
+    client: testing.TestClient, time_to_freeze: datetime, missing_numbers: int, length: int,
 ):
     # first request the calculation
     with freezegun.freeze_time(time_to_freeze):
@@ -137,10 +124,7 @@ def test_get_status_after_requesting_status_returns_response(
     [(7, [(4, 3), (5, 5)]), (10, [(4, 3), (5, 5)]), (15, [(4, 3), (5, 5)])],
 )
 def test_message_is_sent_to_broker(
-    client: testing.TestClient,
-    broker_mock: Mock,
-    length: int,
-    last_two_numbers: Sequence,
+    client: testing.TestClient, broker_mock: Mock, length: int, last_two_numbers: Sequence,
 ):
     client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 

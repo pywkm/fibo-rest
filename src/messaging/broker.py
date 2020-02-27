@@ -33,9 +33,7 @@ class RabbitMqBroker(Broker):
         self._declare_queues()
 
     def register_callback(self, queue_name: str, callback: Callable) -> None:
-        self._channel.basic_consume(
-            queue=queue_name, auto_ack=True, on_message_callback=callback
-        )
+        self._channel.basic_consume(queue=queue_name, auto_ack=True, on_message_callback=callback)
 
     def start_consuming(self) -> None:
         self._channel.start_consuming()

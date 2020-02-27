@@ -84,10 +84,7 @@ class DbStorage(Storage):
                 raise StatusNotFoundError()
 
             request_status = RequestStatus(
-                raw_row.fibo_idx,
-                raw_row.calculated_numbers,
-                raw_row.requested_at,
-                raw_row.eta,
+                raw_row.fibo_idx, raw_row.calculated_numbers, raw_row.requested_at, raw_row.eta,
             )
 
         return request_status

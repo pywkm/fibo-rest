@@ -50,9 +50,7 @@ def test_estimated_time_is_proportional_to_missing_numbers(logic: ApiLogic):
     assert dto.status
     missing_numbers = dto.status.length - dto.status.calculated_numbers
     eta_milliseconds_diff = missing_numbers * DIFFICULTY
-    assert dto.status.eta == dto.status.requested_at + timedelta(
-        milliseconds=eta_milliseconds_diff
-    )
+    assert dto.status.eta == dto.status.requested_at + timedelta(milliseconds=eta_milliseconds_diff)
 
 
 def test_eta_is_longer_with_every_status_check_if_no_new_items_occurs(logic: ApiLogic):

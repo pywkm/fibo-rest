@@ -37,9 +37,7 @@ class ApiLogic:
         old_status = self._storage.get_status(length)
         sequence = self._storage.get_sequence(length)
         calculated_items = len(sequence)
-        new_eta = datetime.now() + timedelta(
-            milliseconds=(length - calculated_items) * DIFFICULTY
-        )
+        new_eta = datetime.now() + timedelta(milliseconds=(length - calculated_items) * DIFFICULTY)
         new_status = RequestStatus(
             old_status.length, calculated_items, old_status.requested_at, new_eta
         )
