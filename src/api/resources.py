@@ -11,11 +11,14 @@ class LogicDependentResource:
 
 
 class SequenceResource(LogicDependentResource):
-    def on_get(self, _req, resp, length):
-        if length < 1:
+    def on_get(self, _req: falcon.Request, resp: falcon.Response, length: int) -> None:
+        if length < 1 or length > self._logic.longest_sequence:
             resp.status = falcon.HTTP_BAD_REQUEST
             resp.body = {
-                "message": "Fibonacci sequence length must be positive integer",
+                "message": (
+                    "Fibonacci sequence length must be positive integer, "
+                    f"but not bigger than {self._logic.longest_sequence}"
+                ),
             }
             return
         dto = self._logic.get_sequence_with_status(length)
@@ -29,16 +32,19 @@ class SequenceResource(LogicDependentResource):
             resp.body = {
                 "sequence": None,
                 "statusUri": STATUS_ENDPOINT.format(length),
-                "estimatedTime": str(dto.status.eta),
+                "estimatedTime": str(dto.status.eta),  # type: ignore  # thinks status is None
             }
 
 
 class StatusResource(LogicDependentResource):
-    def on_get(self, _req, resp, length):
-        if length < 1:
+    def on_get(self, _req: falcon.Request, resp: falcon.Response, length: int) -> None:
+        if length < 1 or length > self._logic.longest_sequence:
             resp.status = falcon.HTTP_BAD_REQUEST
             resp.body = {
-                "message": "Fibonacci sequence length must be positive integer",
+                "message": (
+                    "Fibonacci sequence length must be positive integer, "
+                    f"but not bigger than {self._logic.longest_sequence}"
+                ),
             }
             return
         try:

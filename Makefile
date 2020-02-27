@@ -20,7 +20,7 @@ start-dev:  ## Start dev services
 stop-dev:  ## Stop dev services
 	docker-compose stop
 
-.PHONY: buld
+.PHONY: build
 build:  ## Build dev services
 	docker-compose build
 
@@ -32,10 +32,10 @@ test:  ## Run unit tests
 lint:  ## Run linters (mypy, pylint, black, isort)
 	mypy $(DIRECTORY)
 	pylint $(DIRECTORY)
-	black --check $(DIRECTORY)
+	black -l 100 --check $(DIRECTORY)
 	isort --check-only -rc $(DIRECTORY)
 
 .PHONY: format
 format:  ## Reformat code (black, isort)
-	black $(DIRECTORY)
+	black -l 100 $(DIRECTORY)
 	isort -rc $(DIRECTORY)

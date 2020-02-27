@@ -7,9 +7,10 @@ from falcon import testing
 from mock import Mock
 
 from api.app import create_app
+from api.logic import ApiLogic
 from api.storage.abstract import Storage
 from api.types import FiboSequence, Sequence
-from config import DIFFICULTY, JOB_QUEUE, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
+from config import JOB_QUEUE, REAL_DIFFICULTY, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
 
 
 @pytest.fixture
@@ -18,13 +19,22 @@ def client(storage: Storage, broker_mock: Mock) -> testing.TestClient:
     return testing.TestClient(app)
 
 
+@pytest.fixture
+def expected_400_response(logic: ApiLogic) -> dict:
+    return {
+        "message": (
+            "Fibonacci sequence length must be positive integer, "
+            f"but not bigger than {logic.longest_sequence}"
+        )
+    }
+
+
 @pytest.mark.parametrize(
-    "length, expected_sequence",
-    [(1, [0]), (2, [0, 1]), (4, [0, 1, 1, 2]), (5, [0, 1, 1, 2, 3])],
+    "length, expected_sequence", [(1, [0]), (2, [0, 1]), (4, [0, 1, 1, 2]), (5, [0, 1, 1, 2, 3])],
 )
 def test_get_sequence_for_stored_data(
     client: testing.TestClient, length: int, expected_sequence: FiboSequence
-):
+) -> None:
     expected_response = {"sequence": expected_sequence}
 
     response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
@@ -37,13 +47,10 @@ def test_get_sequence_for_stored_data(
     "length, missing_numbers", [(7, 1), (11, 4), (100, 93)],
 )
 def test_get_sequence_when_data_is_incomplete(
-    client: testing.TestClient,
-    time_to_freeze: datetime,
-    missing_numbers: int,
-    length: int,
-):
+    client: testing.TestClient, time_to_freeze: datetime, missing_numbers: int, length: int,
+) -> None:
     expected_status_uri = STATUS_ENDPOINT.format(length)
-    expected_eta = time_to_freeze + timedelta(milliseconds=DIFFICULTY * missing_numbers)
+    expected_eta = time_to_freeze + timedelta(milliseconds=REAL_DIFFICULTY * missing_numbers)
     expected_response = {
         "sequence": None,
         "statusUri": expected_status_uri,
@@ -58,19 +65,15 @@ def test_get_sequence_when_data_is_incomplete(
 
 
 @pytest.mark.parametrize(
-    "length", [-1, 0],
+    "length", [-1, 0, 10000000],
 )
 def test_get_sequence_invalid_number_returns_bad_request_error(
-    client: testing.TestClient, length: int
-):
-    expected_response = {
-        "message": "Fibonacci sequence length must be positive integer"
-    }
-
+    client: testing.TestClient, length: int, expected_400_response: dict
+) -> None:
     response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_BAD_REQUEST
-    assert response.json == expected_response
+    assert response.json == expected_400_response
 
 
 @pytest.mark.parametrize(
@@ -78,7 +81,7 @@ def test_get_sequence_invalid_number_returns_bad_request_error(
 )
 def test_get_status_unknown_status_returns_not_found_error(
     client: testing.TestClient, length: int
-):
+) -> None:
     expected_response = {"message": f"Calculation for {length} wasn't requested yet"}
 
     response = client.simulate_get(STATUS_ENDPOINT.format(length))
@@ -88,30 +91,23 @@ def test_get_status_unknown_status_returns_not_found_error(
 
 
 @pytest.mark.parametrize(
-    "length", [-1, 0],
+    "length", [-1, 0, 10000000],
 )
 def test_get_status_invalid_length_returns_bad_request_error(
-    client: testing.TestClient, length: int
-):
-    expected_response = {
-        "message": f"Fibonacci sequence length must be positive integer"
-    }
-
+    client: testing.TestClient, length: int, expected_400_response: dict
+) -> None:
     response = client.simulate_get(STATUS_ENDPOINT.format(length))
 
     assert response.status == falcon.HTTP_BAD_REQUEST
-    assert response.json == expected_response
+    assert response.json == expected_400_response
 
 
 @pytest.mark.parametrize(
     "length, missing_numbers", [(7, 1), (11, 4), (100, 93)],
 )
 def test_get_status_after_requesting_status_returns_response(
-    client: testing.TestClient,
-    time_to_freeze: datetime,
-    missing_numbers: int,
-    length: int,
-):
+    client: testing.TestClient, time_to_freeze: datetime, missing_numbers: int, length: int,
+) -> None:
     # first request the calculation
     with freezegun.freeze_time(time_to_freeze):
         sequence_response = client.simulate_get(SEQUENCE_ENDPOINT.format(length))
@@ -122,7 +118,7 @@ def test_get_status_after_requesting_status_returns_response(
     with freezegun.freeze_time(time_to_freeze):
         status_response = client.simulate_get(status_endpoint)
 
-    expected_eta = time_to_freeze + timedelta(milliseconds=DIFFICULTY * missing_numbers)
+    expected_eta = time_to_freeze + timedelta(milliseconds=REAL_DIFFICULTY * missing_numbers)
     expected_status_response = {
         "numbersRequired": length,
         "numbersCalculated": length - missing_numbers,
@@ -137,11 +133,8 @@ def test_get_status_after_requesting_status_returns_response(
     [(7, [(4, 3), (5, 5)]), (10, [(4, 3), (5, 5)]), (15, [(4, 3), (5, 5)])],
 )
 def test_message_is_sent_to_broker(
-    client: testing.TestClient,
-    broker_mock: Mock,
-    length: int,
-    last_two_numbers: Sequence,
-):
+    client: testing.TestClient, broker_mock: Mock, length: int, last_two_numbers: Sequence
+) -> None:
     client.simulate_get(SEQUENCE_ENDPOINT.format(length))
 
     expected_queue = JOB_QUEUE

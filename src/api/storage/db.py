@@ -1,7 +1,7 @@
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, List, Tuple
 
-from sqlalchemy import Column, DateTime, Integer, create_engine
+from sqlalchemy import Column, DateTime, Integer, Numeric, create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
@@ -20,7 +20,7 @@ class SessionScope:
         self._session_provider = sessionmaker(self._engine)
 
     @contextmanager
-    def __call__(self, *args, commit_on_exit: bool = True, **kwargs) -> Session:
+    def __call__(self, *args: str, commit_on_exit: bool = True, **kwargs: str) -> Session:
         session = self._session_provider()
         try:
             yield session
@@ -41,7 +41,7 @@ class FibonacciNumber(Base):
     __tablename__ = "fibonacci_numbers"
 
     index = Column(Integer, primary_key=True)
-    value = Column(Integer, nullable=False)
+    value = Column(Numeric, nullable=False)
 
     def __init__(self, index: int, value: int):
         self.index = index
@@ -63,14 +63,14 @@ class DbStorage(Storage):
 
     def get_sequence(self, up_to_idx: int) -> Sequence:
         with self._session_scope() as session:
-            sequence = (
+            sequence: List[Tuple[Numeric, int]] = (
                 session.query(FibonacciNumber.index, FibonacciNumber.value)
                 .filter(FibonacciNumber.index < up_to_idx)
                 .order_by(FibonacciNumber.index)
                 .all()
             )
 
-        return sequence
+        return [(index, int(value)) for index, value in sequence]
 
     def get_status(self, length: int) -> RequestStatus:
         with self._session_scope() as session:
@@ -84,13 +84,24 @@ class DbStorage(Storage):
                 raise StatusNotFoundError()
 
             request_status = RequestStatus(
-                raw_row.fibo_idx,
-                raw_row.calculated_numbers,
-                raw_row.requested_at,
-                raw_row.eta,
+                raw_row.fibo_idx, raw_row.calculated_numbers, raw_row.requested_at, raw_row.eta,
             )
 
         return request_status
+
+    @property
+    def highest_idx_requested(self) -> int:
+        with self._session_scope() as session:
+            try:
+                highest: Tuple[int] = (
+                    session.query(RequestedCalculations.fibo_idx)
+                    .order_by(RequestedCalculations.fibo_idx.desc())
+                    .limit(1)
+                    .one()
+                )
+                return highest[0]
+            except NoResultFound:
+                return 1  # empty table
 
     def save_status(self, status: RequestStatus) -> None:
         row = RequestedCalculations(

@@ -1,6 +1,7 @@
 import os
 
 DIFFICULTY = int(os.getenv("FIBO_DIFFICULTY", "200"))  # in milliseconds
+REAL_DIFFICULTY = DIFFICULTY + 10  # let's add some time for better ETA estimation
 SEQUENCE_ENDPOINT = "/fibo/{}"
 STATUS_ENDPOINT = "/fibo/{}/status"
 
@@ -14,3 +15,5 @@ DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
 JOB_QUEUE = os.getenv("JOB_QUEUE", "job_queue")
 FIBO_QUEUE = os.getenv("FIBO_QUEUE", "fibo_queue")
+
+USE_MEMORY_CACHE = os.getenv("GENERATOR_CACHE", "off").lower() == "on"
