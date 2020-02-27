@@ -33,19 +33,19 @@ def test_having_last_item_of_fibo_sequence_doesnt_mean_sequence_is_complete(
     assert dto.status.calculated_numbers == 7
 
 
-def test_getting_status_of_not_requested_sequence_raises_an_error(logic: ApiLogic):
+def test_getting_status_of_not_requested_sequence_raises_an_error(logic: ApiLogic) -> None:
     with pytest.raises(StatusNotFoundError):
         logic.get_request_status(13)
 
 
-def test_requesting_sequence_and_getting_its_status(logic: ApiLogic):
+def test_requesting_sequence_and_getting_its_status(logic: ApiLogic) -> None:
     logic.get_sequence_with_status(15)
     status = logic.get_request_status(15)
     assert status.length == 15
     assert status.calculated_numbers == 7
 
 
-def test_estimated_time_is_proportional_to_missing_numbers(logic: ApiLogic):
+def test_estimated_time_is_proportional_to_missing_numbers(logic: ApiLogic) -> None:
     dto: SequenceStatusDTO = logic.get_sequence_with_status(11)
     assert dto.status
     missing_numbers = dto.status.length - dto.status.calculated_numbers
@@ -53,7 +53,7 @@ def test_estimated_time_is_proportional_to_missing_numbers(logic: ApiLogic):
     assert dto.status.eta == dto.status.requested_at + timedelta(milliseconds=eta_milliseconds_diff)
 
 
-def test_eta_is_longer_with_every_status_check_if_no_new_items_occurs(logic: ApiLogic):
+def test_eta_is_longer_with_every_status_check_if_no_new_items_occurs(logic: ApiLogic) -> None:
     dto: SequenceStatusDTO = logic.get_sequence_with_status(12)
     assert dto.status
     original_requested_at = dto.status.requested_at
@@ -65,7 +65,7 @@ def test_eta_is_longer_with_every_status_check_if_no_new_items_occurs(logic: Api
     assert status.eta > original_eta
 
 
-def test_eta_is_shorter_when_there_are_new_items_added(logic: ApiLogic):
+def test_eta_is_shorter_when_there_are_new_items_added(logic: ApiLogic) -> None:
     dto: SequenceStatusDTO = logic.get_sequence_with_status(12)
     assert dto.status
     original_requested_at = dto.status.requested_at

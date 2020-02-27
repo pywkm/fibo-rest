@@ -20,7 +20,7 @@ def create_app(storage: Storage, broker: Broker) -> falcon.API:
     return app
 
 
-def get_app():
+def get_app() -> falcon.API:
     storage = DbStorage()
     broker = RabbitMqBroker()
     return create_app(storage, broker)

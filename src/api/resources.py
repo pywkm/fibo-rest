@@ -11,7 +11,7 @@ class LogicDependentResource:
 
 
 class SequenceResource(LogicDependentResource):
-    def on_get(self, _req, resp, length):
+    def on_get(self, _req: falcon.Request, resp: falcon.Response, length: int) -> None:
         if length < 1:
             resp.status = falcon.HTTP_BAD_REQUEST
             resp.body = {
@@ -29,12 +29,12 @@ class SequenceResource(LogicDependentResource):
             resp.body = {
                 "sequence": None,
                 "statusUri": STATUS_ENDPOINT.format(length),
-                "estimatedTime": str(dto.status.eta),
+                "estimatedTime": str(dto.status.eta),  # type: ignore  # thinks status is None
             }
 
 
 class StatusResource(LogicDependentResource):
-    def on_get(self, _req, resp, length):
+    def on_get(self, _req: falcon.Request, resp: falcon.Response, length: int) -> None:
         if length < 1:
             resp.status = falcon.HTTP_BAD_REQUEST
             resp.body = {

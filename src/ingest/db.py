@@ -6,7 +6,7 @@ from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from ingest import logger
 
 
-def callback(_ch, _method, _properties, body: bytes) -> None:
+def callback(_ch: str, _method: str, _properties: str, body: bytes) -> None:
     message = json.loads(body)
     ((index, value),) = message.items()
     insert_fibo_into_db(index, value)

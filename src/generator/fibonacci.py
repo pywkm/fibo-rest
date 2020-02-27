@@ -17,7 +17,7 @@ class FibonacciNum:
 MEMORY_CACHE: Dict[Tuple[int, int], FibonacciNum] = {}
 
 
-def callback(_ch, _method, _properties, body: bytes) -> None:
+def callback(_ch: str, _method: str, _properties: str, body: bytes) -> None:
     message = json.loads(body)
     calculate_up_to_index = message["length"] - 1
     first = FibonacciNum(*message["last_numbers"][0])

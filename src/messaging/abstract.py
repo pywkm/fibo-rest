@@ -1,10 +1,10 @@
 import abc
-from typing import Callable
+from typing import Any, Callable
 
 
 class Broker(abc.ABC):
     @abc.abstractmethod
-    def register_callback(self, queue_name: str, callback: Callable) -> None:
+    def register_callback(self, queue_name: str, callback: Callable[..., Any]) -> None:
         ...
 
     @abc.abstractmethod

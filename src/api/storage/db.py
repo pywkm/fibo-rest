@@ -20,7 +20,7 @@ class SessionScope:
         self._session_provider = sessionmaker(self._engine)
 
     @contextmanager
-    def __call__(self, *args, commit_on_exit: bool = True, **kwargs) -> Session:
+    def __call__(self, *args: str, commit_on_exit: bool = True, **kwargs: str) -> Session:
         session = self._session_provider()
         try:
             yield session
@@ -63,7 +63,7 @@ class DbStorage(Storage):
 
     def get_sequence(self, up_to_idx: int) -> Sequence:
         with self._session_scope() as session:
-            sequence = (
+            sequence: Sequence = (
                 session.query(FibonacciNumber.index, FibonacciNumber.value)
                 .filter(FibonacciNumber.index < up_to_idx)
                 .order_by(FibonacciNumber.index)
