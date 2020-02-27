@@ -47,4 +47,15 @@ class ApiLogic:
 
     @staticmethod
     def _get_last_fibo_numbers(sequence: Sequence) -> Sequence:
-        return [sequence[-2], sequence[-1]]  # dummy assumption
+        # as long as database is filled asynchronously, we have to be able to find "gaps"
+        if sequence[-1][0] == len(sequence) - 1:
+            return [sequence[-2], sequence[-1]]  # because there are no gaps
+
+        # O(n), but necessary
+        first, second = sequence[0], sequence[1]
+        for item in sequence[2:]:
+            if item[0] == second[0] + 1:
+                first, second = second, item
+                continue
+            break
+        return [first, second]

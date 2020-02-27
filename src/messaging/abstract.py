@@ -12,5 +12,5 @@ class Broker(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def publish(self, queue: str, message: dict) -> None:
+    def publish(self, queue_name: str, message: dict) -> None:
         ...
