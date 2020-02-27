@@ -1,6 +1,7 @@
 import os
 
 DIFFICULTY = int(os.getenv("FIBO_DIFFICULTY", "200"))  # in milliseconds
+REAL_DIFFICULTY = DIFFICULTY + 10  # let's add some time for better ETA estimation
 SEQUENCE_ENDPOINT = "/fibo/{}"
 STATUS_ENDPOINT = "/fibo/{}/status"
 

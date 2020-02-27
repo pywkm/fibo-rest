@@ -13,6 +13,11 @@ class Storage(abc.ABC):
     def get_status(self, length: int) -> RequestStatus:
         ...
 
+    @property
+    @abc.abstractmethod
+    def highest_idx_requested(self) -> int:
+        ...
+
     @abc.abstractmethod
     def save_status(self, status: RequestStatus) -> None:
         ...

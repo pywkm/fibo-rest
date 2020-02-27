@@ -42,12 +42,7 @@ def test_publishing_sequence_with_cache(
     publish_sequence(
         (first_fibo, second_fibo), up_to_index, broker_mock, difficulty=0, use_cache=True
     )
-    expected_calls = [mock.call(FIBO_QUEUE, call) for call in expected_sequence]
-    if expected_calls:
-        assert broker_mock.publish.call_count == len(expected_calls)
-        broker_mock.publish.assert_has_calls(expected_calls)
-    else:
-        broker_mock.publish.assert_not_called()
+    assert_called_with_values(broker_mock, expected_sequence)
 
 
 @pytest.mark.parametrize(
@@ -76,6 +71,12 @@ def test_publishing_sequence_without_cache(
     publish_sequence(
         (first_fibo, second_fibo), up_to_index, broker_mock, difficulty=0, use_cache=False
     )
+    assert_called_with_values(broker_mock, expected_sequence)
+
+
+def assert_called_with_values(
+    broker_mock: mock.Mock, expected_sequence: List[Dict[int, int]]
+) -> None:
     expected_calls = [mock.call(FIBO_QUEUE, call) for call in expected_sequence]
     if expected_calls:
         assert broker_mock.publish.call_count == len(expected_calls)

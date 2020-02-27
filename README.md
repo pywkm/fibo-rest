@@ -36,7 +36,7 @@
     make init-db
     ```
    WARNING: Do not clear DB when app was running for a moment, and generator already cached
-   calculations in the memory. App is not intended to work properly in such case. 
+   calculations in the memory (caching was on). App is not intended to work properly in such case. 
    Generator service should be restarted in that scenario. 
 
 

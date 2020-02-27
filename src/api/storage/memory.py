@@ -31,5 +31,12 @@ class MemoryStorage(Storage):
         except KeyError:
             raise StatusNotFoundError
 
+    @property
+    def highest_idx_requested(self) -> int:
+        try:
+            return max(self._request_statuses.keys())
+        except ValueError:
+            return 1  # empty dict
+
     def save_status(self, status: RequestStatus) -> None:
         self._request_statuses[status.length] = status
