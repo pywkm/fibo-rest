@@ -20,7 +20,7 @@ start-dev:  ## Start dev services
 stop-dev:  ## Stop dev services
 	docker-compose stop
 
-.PHONY: buld
+.PHONY: build
 build:  ## Build dev services
 	docker-compose build
 

@@ -35,6 +35,9 @@
     ```shell script
     make init-db
     ```
+   WARNING: Do not clear DB when app was running for a moment, and generator already cached
+   calculations in the memory. App is not intended to work properly in such case. 
+   Generator service should be restarted in that scenario. 
 
 
 That's all, application is working, and exposing API on the `http://localhost:5555` server

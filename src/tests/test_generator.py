@@ -32,13 +32,53 @@ def test_calculating_next_fibonacci_numbers(
         (FibonacciNum(10, 55), FibonacciNum(11, 89), 16, [{15: 610}, {16: 987}]),  # cached
     ],
 )
-def test_publishing_sequence(
+def test_publishing_sequence_with_cache(
     broker_mock: mock.Mock,
     first_fibo: FibonacciNum,
     second_fibo: FibonacciNum,
     up_to_index: int,
     expected_sequence: List[Dict[int, int]],
-):
-    publish_sequence(up_to_index, first_fibo, second_fibo, broker_mock, difficulty=0)
+) -> None:
+    publish_sequence(
+        (first_fibo, second_fibo), up_to_index, broker_mock, difficulty=0, use_cache=True
+    )
     expected_calls = [mock.call(FIBO_QUEUE, call) for call in expected_sequence]
-    broker_mock.publish.assert_has_calls(expected_calls)
+    if expected_calls:
+        assert broker_mock.publish.call_count == len(expected_calls)
+        broker_mock.publish.assert_has_calls(expected_calls)
+    else:
+        broker_mock.publish.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "first_fibo, second_fibo, up_to_index, expected_sequence",
+    [
+        (FibonacciNum(0, 0), FibonacciNum(1, 1), 1, []),
+        (FibonacciNum(0, 0), FibonacciNum(1, 1), 3, [{2: 1}, {3: 2}]),
+        (FibonacciNum(2, 1), FibonacciNum(3, 2), 4, [{4: 3}]),
+        (FibonacciNum(0, 0), FibonacciNum(1, 1), 4, [{2: 1}, {3: 2}, {4: 3}]),
+        (FibonacciNum(10, 55), FibonacciNum(11, 89), 14, [{12: 144}, {13: 233}, {14: 377}]),
+        (
+            FibonacciNum(10, 55),
+            FibonacciNum(11, 89),
+            16,
+            [{12: 144}, {13: 233}, {14: 377}, {15: 610}, {16: 987}],
+        ),
+    ],
+)
+def test_publishing_sequence_without_cache(
+    broker_mock: mock.Mock,
+    first_fibo: FibonacciNum,
+    second_fibo: FibonacciNum,
+    up_to_index: int,
+    expected_sequence: List[Dict[int, int]],
+) -> None:
+    publish_sequence(
+        (first_fibo, second_fibo), up_to_index, broker_mock, difficulty=0, use_cache=False
+    )
+    expected_calls = [mock.call(FIBO_QUEUE, call) for call in expected_sequence]
+    if expected_calls:
+        assert broker_mock.publish.call_count == len(expected_calls)
+        broker_mock.publish.assert_has_calls(expected_calls)
+    else:
+        broker_mock.publish.assert_not_called()
