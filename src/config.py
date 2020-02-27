@@ -17,3 +17,5 @@ JOB_QUEUE = os.getenv("JOB_QUEUE", "job_queue")
 FIBO_QUEUE = os.getenv("FIBO_QUEUE", "fibo_queue")
 
 USE_MEMORY_CACHE = os.getenv("GENERATOR_CACHE", "off").lower() == "on"
+
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
