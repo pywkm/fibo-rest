@@ -1,6 +1,8 @@
 # Fibo REST
 
-### Exemplary project presenting microservices-like approach to calculating fibonacci sequence.
+### Simple project presenting microservices-like approach to calculating Fibonacci sequences.
+
+As an example of any time consuming task that can be modeled in a such way.
 
 ## Usage
 
@@ -35,9 +37,9 @@
     ```shell script
     make init-db
     ```
-   WARNING: Do not clear DB when app was running for a moment, and generator already cached
+   _WARNING: Do not clear DB when app was running for a moment, and generator already cached
    calculations in the memory (caching was on). App is not intended to work properly in such case. 
-   Generator service should be restarted in that scenario. 
+   Generator service should be restarted in that scenario._
 
 
 That's all, application is working, and exposing API on the `http://localhost:5555` server
@@ -80,12 +82,12 @@ There are only two endpoints exposed:
         {
             "sequence": null,
             "statusUri": "/fibo/55/status",
-            "estimatedTime": "2020-03-03 12:12:12"
+            "eta": "2020-03-03 12:12:12.120021"
         }
         ```
-     Which means calculation is triggered, and result should be accessible around `estimatedTime` on
+     Which means calculation is triggered, and result should be accessible around `eta` on
      the `/fibo/55` endpoint. There's given uri to status endpoint, where calculation progress can
-     be monitored.
+     be monitored. `eta` is in Coordinated Universal Time (UTC) time zone.
 
 * GET `/fibo/<length>/status`
 
@@ -100,18 +102,18 @@ There are only two endpoints exposed:
         Payload:
         ```json
         {
-            "estimatedTime": "2020-03-03 12:12:22",
+            "eta": "2020-03-03 12:12:22.002200",
             "numbersCalculated": 15,
             "numbersRequired": 55
         }
      
-     The `estimatedTime` may differ from original one got from `/fibo/<length>` endpoint, because it
-     is updated on every stratus request.
+    The `eta` may differ from original one got from `/fibo/<length>` endpoint, because it
+    is updated on every status request.
+    
+    If calculation of particular sequence wasn't triggered yet (by request to the first endpoint),
+    status endpoint will return Not Found (404) response:
      
-     If calculation of particular sequence wasn't triggered yet (by request to the first endpoint),
-     status endpoint will return Not Found (404) response:
-     
-         Exemplary request:
+    Exemplary request:
     * GET `http://localhost:5555/fibo/515/status`
     
     Exemplary response:
@@ -120,7 +122,7 @@ There are only two endpoints exposed:
         Payload:
         ```json
         {
-            "message": "Calculation for 515 wasn't requested yet"
+            "message": "Calculation for sequence:515 wasn't requested yet"
         }
         ```
 
@@ -207,3 +209,12 @@ results right away unless it is already cached on the backend.
    pywkm/fibo-rest:master branch.
 
 1. If you've found error or have an idea for improvement don't hesitate to report the Github issue.
+
+
+## TODOs (known flaws):
+- [ ] Add integration test for DB storage
+- [ ] Add e2e tests
+- [ ] Make `ingest` testable
+- [ ] Add dependency injection in main app (`api`)
+- [ ] Make `ingest` more robust/foolproof (retry on error)
+- [ ] Make `messaging` more robust (reconnect consuming channel when connection was lost)
