@@ -2,7 +2,7 @@
 
 ### Simple project presenting microservices-like approach to calculating Fibonacci sequences.
 
-As an example of any time consuming task that can be modeled in a such way.
+As an example of any time-consuming task that can be modeled in a such way.
 
 ## Usage
 
@@ -65,7 +65,7 @@ There are only two endpoints exposed:
         }     
         ```
     
-    Because we are simulating the calculation Fibonacci sequences is time consuming (which is true for very long
+    Because we are simulating the calculation Fibonacci sequence is time-consuming (which is true for very long
     sequences), GET request to that endpoint doesn't always return status code 200 (OK) and response with sequence.
 
     When sequence isn't cached in database, API will respond with status code 202 (Accepted) with different response
@@ -87,7 +87,7 @@ There are only two endpoints exposed:
         ```
      Which means calculation is triggered, and result should be accessible around `eta` on
      the `/fibo/55` endpoint. There's given uri to status endpoint, where calculation progress can
-     be monitored. `eta` is in Coordinated Universal Time (UTC) time zone.
+     be monitored. `eta` is given in the UTC time zone.
 
 * GET `/fibo/<length>/status`
 
@@ -162,7 +162,7 @@ Application is built from 5 microservices:
     * Not accessible from outside
     * Consumes Fibo numbers from RabbitMQ queue and puts them into `database`
     
-This is just only the POC. We are simulating here any time consuming calculations, that can be
+This is only the PoC. We are simulating here any time-consuming calculations that can be
 cached (returned immediately) or outsourced for later execution. In fact Fibonacci sequence
 calculation can be done in reasonable time up to quite big length (~1000) so here we are slowing
 that down artificially with `FIBO_DIFICULTY` parameter in `.env` (microseconds required to calculate
@@ -212,9 +212,9 @@ results right away unless it is already cached on the backend.
 
 
 ## TODOs (known flaws):
-- [ ] Add integration test for DB storage
-- [ ] Add e2e tests
-- [ ] Make `ingest` testable
-- [ ] Add dependency injection in main app (`api`)
-- [ ] Make `ingest` more robust/foolproof (retry on error)
-- [ ] Make `messaging` more robust (reconnect consuming channel when connection was lost)
+- [ ] Add integration test for DB storage;
+- [ ] Add e2e tests;
+- [ ] Make `ingest` testable;
+- [ ] Add dependency injection in main app (`api`), more clean architecture in the rest of apps;
+- [ ] Make `ingest` more robust/foolproof (retry on error);
+- [ ] Make `messaging` more robust (reconnect consuming channel when connection was lost).
