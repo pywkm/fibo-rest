@@ -6,7 +6,7 @@ extension-pkg-whitelist=falcon
 
 [MESSAGES CONTROL]
 disable=missing-docstring,too-few-public-methods,redefined-outer-name,no-self-use,logging-fstring-interpolation,trailing-comma-tuple,unsubscriptable-object,bad-continuation
-good-names=app,storage,logic,engine,session
+good-names=app,storage,logic,engine,session,broker,logger
 max-line-length=100
 
 [SIMILARITIES]

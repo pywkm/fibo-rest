@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from api.config import DATABASE_URL
 from api.storage.db import Base, FibonacciNumber
+from config import DATABASE_URL
 
 if __name__ == "__main__":
     engine = create_engine(DATABASE_URL)

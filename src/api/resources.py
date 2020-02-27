@@ -1,8 +1,8 @@
 import falcon
 
-from api.config import STATUS_ENDPOINT
 from api.exceptions import StatusNotFoundError
 from api.logic import ApiLogic
+from config import STATUS_ENDPOINT
 
 
 class LogicDependentResource:

@@ -4,33 +4,23 @@ import falcon
 import freezegun
 import pytest
 from falcon import testing
+from mock import Mock
 
 from api.app import create_app
-from api.config import DIFFICULTY, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
 from api.storage.abstract import Storage
-from api.storage.memory import MemoryStorage
-from api.types import FiboSequence
+from api.types import FiboSequence, Sequence
+from config import DIFFICULTY, JOB_QUEUE, SEQUENCE_ENDPOINT, STATUS_ENDPOINT
 
 
 @pytest.fixture
-def storage() -> Storage:
-    return MemoryStorage({0: 0, 1: 1, 2: 1, 3: 2, 10: 55})
-
-
-@pytest.fixture
-def client(storage: Storage) -> testing.TestClient:
-    app = create_app(storage)
+def client(storage: Storage, broker_mock: Mock) -> testing.TestClient:
+    app = create_app(storage, broker_mock)
     return testing.TestClient(app)
-
-
-@pytest.fixture()
-def time_to_freeze() -> datetime:
-    return datetime(2020, 2, 20, 22, 00, 22)
 
 
 @pytest.mark.parametrize(
     "length, expected_sequence",
-    [(1, [0]), (2, [0, 1]), (3, [0, 1, 1]), (4, [0, 1, 1, 2])],
+    [(1, [0]), (2, [0, 1]), (4, [0, 1, 1, 2]), (5, [0, 1, 1, 2, 3])],
 )
 def test_get_sequence_for_stored_data(
     client: testing.TestClient, length: int, expected_sequence: FiboSequence
@@ -44,7 +34,7 @@ def test_get_sequence_for_stored_data(
 
 
 @pytest.mark.parametrize(
-    "length, missing_numbers", [(5, 1), (11, 6), (100, 95)],
+    "length, missing_numbers", [(7, 1), (11, 4), (100, 93)],
 )
 def test_get_sequence_when_data_is_incomplete(
     client: testing.TestClient,
@@ -114,7 +104,7 @@ def test_get_status_invalid_length_returns_bad_request_error(
 
 
 @pytest.mark.parametrize(
-    "length, missing_numbers", [(5, 1), (11, 6), (100, 95)],
+    "length, missing_numbers", [(7, 1), (11, 4), (100, 93)],
 )
 def test_get_status_after_requesting_status_returns_response(
     client: testing.TestClient,
@@ -140,3 +130,20 @@ def test_get_status_after_requesting_status_returns_response(
     }
     assert status_response.status == falcon.HTTP_OK
     assert status_response.json == expected_status_response
+
+
+@pytest.mark.parametrize(
+    "length, last_two_numbers",
+    [(7, [(4, 3), (5, 5)]), (10, [(4, 3), (5, 5)]), (15, [(4, 3), (5, 5)])],
+)
+def test_message_is_sent_to_broker(
+    client: testing.TestClient,
+    broker_mock: Mock,
+    length: int,
+    last_two_numbers: Sequence,
+):
+    client.simulate_get(SEQUENCE_ENDPOINT.format(length))
+
+    expected_queue = JOB_QUEUE
+    expected_message = {"length": length, "last_numbers": last_two_numbers}
+    broker_mock.publish.assert_called_once_with(expected_queue, expected_message)

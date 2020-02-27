@@ -7,11 +7,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
-from api.config import DATABASE_URL
 from api.entities import RequestStatus
 from api.exceptions import StatusNotFoundError
 from api.storage.abstract import Storage
 from api.types import Sequence
+from config import DATABASE_URL
 
 
 class SessionScope:
@@ -66,6 +66,7 @@ class DbStorage(Storage):
             sequence = (
                 session.query(FibonacciNumber.index, FibonacciNumber.value)
                 .filter(FibonacciNumber.index < up_to_idx)
+                .order_by(FibonacciNumber.index)
                 .all()
             )
 
@@ -99,4 +100,4 @@ class DbStorage(Storage):
             eta=status.eta,
         )
         with self._session_scope() as session:
-            session.add(row)
+            session.merge(row)

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
     api:
@@ -13,6 +13,8 @@ services:
           - "./src/:/app/src/"
         depends_on:
           - database
+          - rabbitmq
+
     database:
         image: postgres:12.0-alpine
         restart: always
@@ -28,6 +30,34 @@ services:
           - postgres_data:/var/lib/postgresql/data/
         command:
           - -p ${DB_PORT}
+
+    rabbitmq:
+        image: rabbitmq:3.8.2-management-alpine
+        ports:
+          - "15672:15672"
+
+    generator:
+        build:
+          context: ./
+          dockerfile: docker/generator/Dockerfile
+        env_file:
+          - ./.env
+        volumes:
+          - "./src/:/app/src/"
+        depends_on:
+          - rabbitmq
+
+    ingest:
+      build:
+        context: ./
+        dockerfile: docker/ingest/Dockerfile
+      env_file:
+        - ./.env
+      volumes:
+        - "./src/:/app/src/"
+      depends_on:
+        - database
+        - rabbitmq
 
 volumes:
     postgres_data:
