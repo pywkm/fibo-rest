@@ -4,6 +4,7 @@ from time import sleep
 from typing import Dict, Tuple
 
 from config import DIFFICULTY, FIBO_QUEUE, USE_MEMORY_CACHE
+from generator import logger
 from messaging.abstract import Broker
 from messaging.broker import RabbitMqBroker
 
@@ -19,6 +20,7 @@ MEMORY_CACHE: Dict[Tuple[int, int], FibonacciNum] = {}
 
 def callback(_ch: str, _method: str, _properties: str, body: bytes) -> None:
     message = json.loads(body)
+    logger.debug("Received message: %s", message)
     calculate_up_to_index = message["length"] - 1
     first = FibonacciNum(*message["last_numbers"][0])
     second = FibonacciNum(*message["last_numbers"][1])
@@ -37,12 +39,18 @@ def publish_sequence(
     first, second = starting_numbers
     while second.index < up_to_index:
         if use_cache and (first.index, second.index) in MEMORY_CACHE:
-            first, second = second, MEMORY_CACHE[(first.index, second.index)]
+            key = (first.index, second.index)
+            first, second = second, MEMORY_CACHE[key]
+            logger.debug("Fetching from memory cache: {%s: %s}", key, second)
             continue
         next_fibo = calculate_next_fibonacci(first, second, difficulty)
-        broker.publish(FIBO_QUEUE, {next_fibo.index: next_fibo.value})
+        message = {next_fibo.index: next_fibo.value}
+        logger.debug("Publishing message: %s", message)
+        broker.publish(FIBO_QUEUE, message)
         if use_cache:
-            MEMORY_CACHE[(first.index, second.index)] = next_fibo
+            key = (first.index, second.index)
+            MEMORY_CACHE[key] = next_fibo
+            logger.debug("Putting in memory cache: {%s: %s}", key, second)
         first, second = second, next_fibo
 
 

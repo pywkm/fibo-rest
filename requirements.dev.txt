@@ -1,5 +1,6 @@
 -r ./src/api/requirements.txt
 -r ./src/generator/requirements.txt
+-r ./src/ingest/requirements.txt
 
 pytest==5.3.5
 pylint==2.4.4

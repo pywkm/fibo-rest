@@ -54,7 +54,7 @@ def test_get_sequence_when_data_is_incomplete(
     expected_response = {
         "sequence": None,
         "statusUri": expected_status_uri,
-        "estimatedTime": str(expected_eta),
+        "eta": str(expected_eta),
     }
 
     with freezegun.freeze_time(time_to_freeze):
@@ -82,7 +82,7 @@ def test_get_sequence_invalid_number_returns_bad_request_error(
 def test_get_status_unknown_status_returns_not_found_error(
     client: testing.TestClient, length: int
 ) -> None:
-    expected_response = {"message": f"Calculation for {length} wasn't requested yet"}
+    expected_response = {"message": f"Calculation for sequence:{length} wasn't requested yet"}
 
     response = client.simulate_get(STATUS_ENDPOINT.format(length))
 
@@ -122,7 +122,7 @@ def test_get_status_after_requesting_status_returns_response(
     expected_status_response = {
         "numbersRequired": length,
         "numbersCalculated": length - missing_numbers,
-        "estimatedTime": str(expected_eta),
+        "eta": str(expected_eta),
     }
     assert status_response.status == falcon.HTTP_OK
     assert status_response.json == expected_status_response

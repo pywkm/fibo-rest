@@ -32,7 +32,7 @@ class SequenceResource(LogicDependentResource):
             resp.body = {
                 "sequence": None,
                 "statusUri": STATUS_ENDPOINT.format(length),
-                "estimatedTime": str(dto.status.eta),  # type: ignore  # thinks status is None
+                "eta": str(dto.status.eta),  # type: ignore  # thinks status is None
             }
 
 
@@ -51,12 +51,12 @@ class StatusResource(LogicDependentResource):
             status = self._logic.get_request_status(length)
             resp.status = falcon.HTTP_OK
             resp.body = {
-                "estimatedTime": str(status.eta),
+                "eta": str(status.eta),
                 "numbersCalculated": status.calculated_numbers,
                 "numbersRequired": status.length,
             }
         except StatusNotFoundError:
             resp.status = falcon.HTTP_NOT_FOUND
             resp.body = {
-                "message": f"Calculation for {length} wasn't requested yet",
+                "message": f"Calculation for sequence:{length} wasn't requested yet",
             }
